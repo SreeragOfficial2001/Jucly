@@ -1,0 +1,17 @@
+
+const express = require("express");
+const Product = require("../models/Product");
+const router = express.Router();
+
+router.get("/list", async (req, res) => {
+  console.log("Fetching products...");
+  
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching products" });
+  }
+});
+
+module.exports = router;
