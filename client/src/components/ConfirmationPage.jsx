@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import sendConfirmationEmail from "../utils/sendConfirmationEmail";
+import axios from "axios";
 import { motion } from "framer-motion";
 
 const ConfirmationPage = () => {
   useEffect(() => {
-    sendConfirmationEmail({
+    axios.post("https://jucly-backend.onrender.com/api/email/send-email", {
       name: "Sreerag",
       email: "sreeragofficial2001@gmail.com",
       orderId: "JUC1245",
@@ -14,7 +14,9 @@ const ConfirmationPage = () => {
         { name: "Royal Mango Elixir", quantity: 2 },
         { name: "Berry Luxe Blast", quantity: 1 },
       ],
-    });
+    })
+    .then((res) => console.log("✅ Email sent:", res.data))
+    .catch((err) => console.error("❌ Email failed:", err.response?.data || err.message));
   }, []);
 
   return (
