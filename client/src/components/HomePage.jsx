@@ -1,6 +1,5 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import products from "../data/products";
 import { motion } from "framer-motion";
 import axios from "../api/axios";
 
@@ -11,14 +10,11 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  console.log(products);
-  
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("/api/products/list");
-        setProducts(response.data); // adjust based on API structure
+        setProducts(response.data);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch products");
@@ -28,13 +24,6 @@ const HomePage = () => {
 
     fetchProducts();
   }, []);
-
-  if (loading) return <p>Loading products...</p>;
-  if (error) return <p>{error}</p>;
-
-  
-
-  
 
   const handleSelect = (productId) => {
     if (selectedProducts[productId]) {
@@ -51,6 +40,11 @@ const HomePage = () => {
     setSelectedProducts({ ...selectedProducts, [productId]: value });
   };
 
+  const totalQuantity = Object.values(selectedProducts).reduce(
+    (sum, qty) => sum + qty,
+    0
+  );
+
   const goToBooking = () => {
     const selectedIds = Object.keys(selectedProducts);
     if (selectedIds.length > 0) {
@@ -60,17 +54,44 @@ const HomePage = () => {
     }
   };
 
+  if (loading) return <p>Loading products...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <div className="bg-gradient-to-br from-[#fef9f4] to-[#f3e9e1] min-h-screen py-16 px-6 md:px-20 font-sans">
-      <h1 className="text-5xl md:text-6xl font-extrabold text-center text-[#2c1c1c] mb-10 drop-shadow-md">
+      <motion.h1
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-5xl md:text-6xl font-extrabold text-center text-[#2c1c1c] mb-10 drop-shadow-md"
+      >
         Explore Our Premium Juice Collection
-      </h1>
+      </motion.h1>
 
-      <div className="text-right mb-6 text-lg text-[#3b2f2f] font-medium">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="text-right mb-2 text-lg text-[#3b2f2f] font-medium"
+      >
         Selected Juices: {Object.keys(selectedProducts).length}
-      </div>
+      </motion.div>
 
-      <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="text-right mb-6 text-sm text-gray-600"
+      >
+        Total Quantity: {totalQuantity}
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {products.map((product, index) => {
           const isSelected = selectedProducts[product.id];
           return (
@@ -79,8 +100,11 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
               className={`relative bg-white/70 backdrop-blur-lg rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] p-6 border transition-all duration-300 ${
-                isSelected ? "ring-4 ring-[#e6b800] scale-[1.02]" : "hover:scale-[1.03]"
+                isSelected
+                  ? "ring-4 ring-[#e6b800] scale-[1.02]"
+                  : "hover:scale-[1.03]"
               }`}
             >
               {isSelected && (
@@ -97,7 +121,9 @@ const HomePage = () => {
               <h2 className="text-2xl font-bold text-[#2d1d1d] mb-1">
                 {product.name}
               </h2>
-              <p className="text-gray-700 text-sm mb-3">{product.description}</p>
+              <p className="text-gray-700 text-sm mb-3">
+                {product.description}
+              </p>
 
               <div className="flex justify-between items-center mt-4">
                 <span className="text-xl font-bold text-[#e6b800]">
@@ -120,30 +146,62 @@ const HomePage = () => {
                   <label className="block text-sm font-medium text-[#3b2f2f] mb-1">
                     Quantity:
                   </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={selectedProducts[product.id]}
-                    onChange={(e) =>
-                      handleQuantityChange(product.id, parseInt(e.target.value))
-                    }
-                    className="w-24 px-4 py-2 border border-gray-300 rounded-full text-center shadow-inner focus:outline-none focus:ring-2 focus:ring-[#e6b800]"
-                  />
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          product.id,
+                          selectedProducts[product.id] - 1
+                        )
+                      }
+                      className="px-3 py-1 bg-[#e6b800] text-white rounded-full font-bold shadow hover:bg-yellow-600"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={selectedProducts[product.id]}
+                      onChange={(e) =>
+                        handleQuantityChange(
+                          product.id,
+                          parseInt(e.target.value)
+                        )
+                      }
+                      className="w-16 px-4 py-2 border border-gray-300 rounded-full text-center shadow-inner focus:outline-none focus:ring-2 focus:ring-[#e6b800]"
+                    />
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          product.id,
+                          selectedProducts[product.id] + 1
+                        )
+                      }
+                      className="px-3 py-1 bg-[#e6b800] text-white rounded-full font-bold shadow hover:bg-yellow-600"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               )}
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
-      <div className="flex justify-center mt-14">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.6 }}
+        className="flex justify-center mt-14"
+      >
         <button
           onClick={goToBooking}
           className="bg-[#3b2f2f] text-white text-lg font-semibold px-8 py-4 rounded-full hover:bg-[#5b3f3f] shadow-lg transition duration-300"
         >
           Book Selected Juices ({Object.keys(selectedProducts).length})
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 };
