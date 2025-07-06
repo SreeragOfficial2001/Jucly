@@ -1,16 +1,18 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const sendEmail = async ({ name, email, orderId, total, products }) => {
+const sendEmail = async ({ name, email, orderId, total, items }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
+      pass: process.env.GMAIL_PASS, // use App Password from Gmail
     },
   });
 
-  const items = products.map(p => `<li>${p.name} x ${p.quantity}</li>`).join("");
+  const itemList = items
+    .map((item) => `<li>${item.name} x ${item.quantity}</li>`)
+    .join("");
 
   const mailOptions = {
     from: `Jucly <${process.env.GMAIL_USER}>`,
@@ -18,10 +20,10 @@ const sendEmail = async ({ name, email, orderId, total, products }) => {
     subject: `Your Jucly Order (ID: ${orderId})`,
     html: `
       <h2 style="color:#C49A6C;">Thanks for your order, ${name}!</h2>
-      <p>Order ID: ${orderId}</p>
-      <ul>${items}</ul>
+      <p><strong>Order ID:</strong> ${orderId}</p>
+      <ul>${itemList}</ul>
       <p><strong>Total:</strong> ₹${total}</p>
-      <p>Estimated Delivery: 2–3 days</p>
+      <p>🛵 Estimated Delivery: 2–3 days</p>
     `,
   };
 

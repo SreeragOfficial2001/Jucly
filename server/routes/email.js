@@ -1,19 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const sendEmail = require("../utils/sendEmail"); // optional, or write logic directly here
+const sendEmail = require("../utils/sendEmail"); // Your email sending function
 
+// POST /api/email/send-email
 router.post("/send-email", async (req, res) => {
   const { name, email, orderId, total, items } = req.body;
 
+  // Validate input
   if (!name || !email || !orderId || !total || !items) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    await sendEmail({ name, email, orderId, total, items });
+    await sendEmail({ name, email, orderId, total, products: items });
     res.status(200).json({ message: "Email sent successfully" });
   } catch (err) {
-    console.error("Email error:", err);
+    console.error("❌ Email error:", err);
     res.status(500).json({ message: "Failed to send email", error: err.message });
   }
 });
