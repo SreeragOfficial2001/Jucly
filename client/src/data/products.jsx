@@ -27,7 +27,7 @@ const products = [
     description: "Refreshing orange and lime blend.",
   },
   {
-    id: 4,
+    id: 4 ,
     name: "Tropical Velvet",
     price: "₹319",
     image: Tropical,
